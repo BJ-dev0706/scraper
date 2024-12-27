@@ -1,43 +1,46 @@
-document.addEventListener("DOMContentLoaded", () => {
-  document.getElementById("scrape-btn").addEventListener("click", () => {
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      if (tabs[0]) {
-        chrome.tabs.sendMessage(
-          tabs[0].id,
-          { action: "scrape" },
-          (response) => {
-            if (chrome.runtime.lastError) {
-              console.error("Error sending message:", chrome.runtime.lastError);
-            } else {
-              console.log("Received response from content script:", response);
-              if (response && response.products) {
-                download(response.products)
-              }
-            }
-          }
-        );
+function downloadAsExcel(data) {
+  // Convert data to a worksheet
+  const worksheet = XLSX.utils.json_to_sheet(data);
+
+  // Create a new workbook and append the worksheet
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Scraped Data");
+
+  // Write the workbook and trigger a download
+  const excelFile = XLSX.write(workbook, { bookType: "xlsx", type: "binary" });
+  const blob = new Blob([s2ab(excelFile)], { type: "application/octet-stream" });
+  const url = URL.createObjectURL(blob);
+
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "scraped_data.xlsx";
+  link.click();
+
+  // Clean up
+  URL.revokeObjectURL(url);
+}
+
+// Helper function to convert a string to an ArrayBuffer
+function s2ab(s) {
+  const buffer = new ArrayBuffer(s.length);
+  const view = new Uint8Array(buffer);
+  for (let i = 0; i < s.length; i++) {
+    view[i] = s.charCodeAt(i) & 0xff;
+  }
+  return buffer;
+}
+
+document.getElementById("scrape-btn").addEventListener("click", () => {
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    chrome.tabs.sendMessage(tabs[0].id, { action: "scrape" }, (response) => {
+      if (response && response.products) {
+        console.log("Scraped Products:", response.products);
+
+        // Download data as Excel
+        downloadAsExcel(response.products);
       } else {
-        console.error("No active tab found.");
+        console.error("No response or products received.");
       }
     });
   });
 });
-
-function download(products) {
-  // Convert the products object to a JSON string
-  const jsonContent = JSON.stringify(products, null, 2); // Pretty print with 2-space indentation
-  const blob = new Blob([jsonContent], { type: 'application/json' });
-  
-  // Create a link element
-  const link = document.createElement('a');
-  link.href = URL.createObjectURL(blob);
-  link.download = 'products.json'; // Name of the downloaded file
-  
-  // Append to the body, click to download, and remove the link
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  
-  // Clean up the URL object
-  URL.revokeObjectURL(link.href);
-}
