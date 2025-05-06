@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Price and Image Scraper</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        width: 250px;
+        padding: 10px;
+      }
+      button {
+        width: 100%;
+        padding: 10px;
+        margin-top: 10px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        cursor: pointer;
+      }
+      .input-group {
+        margin-top: 10px;
+      }
+      label {
+        display: block;
+        margin-bottom: 5px;
+      }
+      input {
+        width: 50px;
+        padding: 5px;
+      }
+      #status {
+        margin-top: 10px;
+        font-size: 12px;
+        color: #666;
+      }
+      .progress {
+        margin-top: 10px;
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <h3>Scrape Prices & Images</h3>
+    
+    <div class="input-group">
+      <label for="max-pages">Number of pages to scrape:</label>
+      <input type="number" id="max-pages" min="1" max="20" value="5">
+    </div>
+    
+    <button id="scrape-btn">Start Scraping</button>
+    
+    <div id="status"></div>
+    <div class="progress">
+      <p>Page: <span id="current-page">0</span></p>
+      <p>Products found: <span id="total-products">0</span></p>
+    </div>
+    
+    <script src="../js/popup.js"></script>
+    <script src="../js/xlsx.full.min.js"></script>
+  </body>
+</html>
