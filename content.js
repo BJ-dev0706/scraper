@@ -1,76 +1,79 @@
 console.log("Content script loaded.");
 
-function scrapeProductData() {
+const GetProducts = () => {
   const cars = [];
+  const products = document.querySelectorAll(".iompba0.iompba3._1lalutr15c._listing-card_39o31_1._listing-card-is-wide_39o31_37");
+  products.forEach(product => {
+    const car = scrapeProductData(product);
+    cars.push(car);
+  });
+  return cars;
+}
+
+const scrapeProductData = (product) => {
+  const {year, make, model} = extract(product.querySelector("span.iompba0._1lalutrg6._1tlv1fe9o.a6hzxti.a6hzxt0.a6hzxt0")?.innerText || " ")
 
   const car = {
-    link: document.querySelector("a").href || " ",
-    name: document.querySelector(".iompba0._1lalutrg0._1tlv1fe6n.a6hzxtb.a6hzxt0.a6hzxt0")?.innerText || " ",
-    model: extractCarDetails(document.querySelector(".iompba0._1lalutrg0._1tlv1fe6n.a6hzxtb.a6hzxt0.a6hzxt0")?.innerText || " ").year,
-    year: extractCarDetails(document.querySelector(".iompba0._1lalutrg0._1tlv1fe6n.a6hzxtb.a6hzxt0.a6hzxt0")?.innerText || " ").model,
-    make: extractCarDetails(document.querySelector(".iompba0._1lalutrg0._1tlv1fe6n.a6hzxtb.a6hzxt0.a6hzxt0")?.innerText || " ").make,
-    spec_variant: document.querySelector(".variant")?.innerText || " ",
-    location: document.querySelector(".location")?.innerText || " ",
-    region: document.querySelector(".region")?.innerText || " ",
-    kms: document.querySelector(".kms")?.innerText || " ",
-    kms_category: document.querySelector(".kms-category")?.innerText || " ",
-    fuel_type: document.querySelector(".fuel-type")?.innerText || " ",
-    transmission: document.querySelector(".transmission")?.innerText || " ",
-    fourwd: document.querySelector(".fourwd")?.innerText || " ",
-    price_type: document.querySelector(".price-type")?.innerText || " ",
-    est_price: document.querySelector(".est-price")?.innerText || " ",
-    number_plate: document.querySelector(".number-plate")?.innerText || " ",
-    vin: document.querySelector(".vin")?.innerText || " ",
-    ext_color: document.querySelector(".ext-color")?.innerText || " ",
-    imp_history: document.querySelector(".imp-history")?.innerText || " ",
-    listed_category: document.querySelector(".listed-category")?.innerText || " ",
-    number_of_days_listed: document.querySelector(".days-listed")?.innerText || " ",
-    dealer_name: document.querySelector(".iompba0.iompba3._1lalutrgu._1lalutrfo._1lalutrhi._1lalutro6._1lalutro7._1lalutro8._1lalutro9._1lalutroa._1lalutrob._1lalutr320")?.querySelectorAll("span")?.[2]?.innerText || " ",
-    dealer_address: document.querySelector(".iompba0.iompba3._1lalutrgu._1lalutrfo._1lalutrhi._1lalutro6._1lalutro7._1lalutro8._1lalutro9._1lalutroa._1lalutrob._1lalutr320")?.innerText || " ",
-    listed_price: document.querySelector(".iompba0._1lalutrg0._1tlv1fe6n.a6hzxte.a6hzxt0.a6hzxt0")?.innerText || " "
+    link: product.querySelector('a[aria-label="View details"]')?.href || " ",
+    name: product.querySelector("span.iompba0._1lalutrg6._1tlv1fe9o.a6hzxti.a6hzxt0.a6hzxt0")?.innerText || " ",
+    year,
+    make,
+    model,
+    spec_variant: product.querySelector("div.iompba0.iompba3._1lalutrfo.a6hzxt0").querySelector("span.iompba0._1lalutrg6.a6hzxt3.a6hzxt0.a6hzxt0")?.innerText || " ",
+    location: product.querySelector("div[data-testid='seller-section']")?.querySelector("div.iompba0.iompba3._1lalutrh0._1lalutrfu._1lalutrho._1lalutrp6._1lalutr32c")?.querySelector("span.iompba0._1lalutrg6.a6hzxt3.a6hzxt0.a6hzxt0")?.innerText || " ",
+    region: "AU",
+    kms: product.querySelectorAll("div.iompba0.iompba3._1lalutrh0._1lalutrfu._1lalutrho._1lalutrr0._1lalutr32c")[3].querySelector("span.iompba0._1lalutrg6._1tlv1fe6c.a6hzxt3.a6hzxt0.a6hzxt0")?.innerText || " ",
+    fuel_type: product.querySelectorAll("div.iompba0.iompba3._1lalutrh0._1lalutrfu._1lalutrho._1lalutrr0._1lalutr32c")[2].querySelector("span.iompba0._1lalutrg6._1tlv1fe6c.a6hzxt3.a6hzxt0.a6hzxt0")?.innerText || " ",
+    transmission: product.querySelectorAll("div.iompba0.iompba3._1lalutrh0._1lalutrfu._1lalutrho._1lalutrr0._1lalutr32c")[1].querySelector("span.iompba0._1lalutrg6._1tlv1fe6c.a6hzxt3.a6hzxt0.a6hzxt0")?.innerText || " ",
+    fourwd: product.querySelector(".fourwd")?.innerText || "Not indicated",
+    price_type: product.querySelector("div.iompba0.iompba3._1lalutrfu._1lalutri0._1lalutrou._1lalutr32c")?.querySelector("span.iompba0._1lalutrg6.a6hzxta.a6hzxt0.a6hzxt0").innerText || " ",
+    est_price: product.querySelector("div.iompba0.iompba3._1lalutrfu._1lalutri0._1lalutrou._1lalutr32c")?.querySelector("a.iompba0.iompba4._1lalutrg6.a6hzxta.a6hzxt0._1vzaghk4._1vzaghk5._1vzaghke").innerText || " ",
+    price: product.querySelector("div.iompba0.iompba3._1lalutrfu._1lalutri0._1lalutrou._1lalutr32c")?.querySelector("div.iompba0.iompba3._1lalutrfo._1lalutr150.a6hzxt0")?.querySelector("span.iompba0._1lalutrg6._1tlv1fe9o.a6hzxtk.a6hzxt0.a6hzxt0").innerText || " ",
+    number_plate: product.querySelector(".number-plate")?.innerText || "Not indicated",
+    vin: product.querySelector(".vin")?.innerText || "Not indicated",
+    ext_color: product.querySelector(".ext-color")?.innerText || "Not mentioned",
+    imp_history: product.querySelector(".imp-history")?.innerText || "Not explicitly stated",
+    listed_category: product.querySelector(".listed-category")?.innerText || "Not mentioned",
+    number_of_days_listed: product.querySelector(".days-listed")?.innerText || "Not shown",
+    dealer_name: product.querySelector(".iompba0.iompba3._1lalutrgu._1lalutrfo._1lalutrhi._1lalutro6._1lalutro7._1lalutro8._1lalutro9._1lalutroa._1lalutrob._1lalutr320")?.querySelectorAll("span")?.[2]?.innerText || "Not shown",
+    dealer_address: product.querySelector("div[data-testid='seller-section']")?.querySelector("div.iompba0.iompba3._1lalutrh0._1lalutrfu._1lalutrho._1lalutrp6._1lalutr32c")?.querySelector("span.iompba0._1lalutrg6.a6hzxt3.a6hzxt0.a6hzxt0")?.innerText || " ",
+    listed_price: product.querySelector(".iompba0._1lalutrg0._1tlv1fe6n.a6hzxte.a6hzxt0.a6hzxt0")?.innerText || "Not shown"
   };
-  cars.push(car);
-
-  console.log("Scraped Cars:", cars);
-  return cars;
+  return car;
 }
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   console.log("Message received in content script:", request);
   if (request.action === "scrape") {
-    const cars = scrapeProductData();
+    const cars = GetProducts();
+    console.log(cars);
     sendResponse({ products: cars });
   }
 });
 
+const knownMakes = [
+  "Kia", "Chevrolet", "BMW", "Toyota", "Hyundai", "Mitsubishi", "LDV", "Tesla",
+  "Land Rover", "Volkswagen", "GWM", "Ford", "Subaru", "Chery", "Porsche", "Nissan",
+  "Holden"
+];
 
-function extractCarDetails(carName) {
-  if (!carName) return { year: null, make: null, model: null };
+const extract = (car) => {
+  const words = car.split(" ");
+  const year = words[0];
+  const remaining = words.slice(1);
 
-  const yearPattern = /^\d{4}/; // Matches the year (4 digits at the start)
-  const yearMatch = carName.match(yearPattern);
-  const year = yearMatch ? yearMatch[0] : null;
+  let make = "";
+  let makeEndIndex = 0;
 
-  // Remove the year and split the remaining string
-  const remainingDetails = year ? carName.replace(year, "").trim() : carName.trim();
-  const parts = remainingDetails.split(" "); // Split by spaces
-
-  // Assume the first part (or two parts) represent the make
-  let make = null;
-  let model = null;
-
-  if (parts.length > 1) {
-    make = parts[0]; // First word is often the make
-    // Check for multi-word make (e.g., "Mercedes-Benz")
-    if (parts[1].includes("-")) {
-      make += " " + parts[1];
-      model = parts.slice(2).join(" "); // Remaining part is car type
-    } else {
-      model = parts.slice(1).join(" "); // Remaining part is car type
+  for (let i = 1; i <= 2; i++) {
+    const candidate = remaining.slice(0, i).join(" ");
+    if (knownMakes.includes(candidate)) {
+      make = candidate;
+      makeEndIndex = i;
     }
-  } else {
-    model = remainingDetails; // If only one part remains, it's the car type
   }
+
+  const model = remaining.slice(makeEndIndex).join(" ");
 
   return { year, make, model };
 }

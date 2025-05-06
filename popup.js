@@ -36,7 +36,6 @@ document.getElementById("scrape-btn").addEventListener("click", () => {
       if (response && response.products) {
         console.log("Scraped Products:", response.products);
 
-        // Download data as Excel
         downloadAsExcel(response.products);
       } else {
         console.error("No response or products received.");
